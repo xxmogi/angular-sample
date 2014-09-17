@@ -1,0 +1,29 @@
+{
+  "name": "app",
+  "main": "app.js",
+  "version": "0.0.0",
+  "authors": [
+    "xxmogi <xxmogi@gmail.com>"
+  ],
+  "description": "myapp",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    ""
+  ],
+  "license": "MIT",
+  "homepage": "www.wasted-laboratory.info",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-route": "~1.2.25",
+    "bootstrap": "~3.2.0"
+  }
+}
