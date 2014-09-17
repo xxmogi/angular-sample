@@ -18,7 +18,35 @@ angular.module('App', ['ngRoute'])
   });
 }])
 
-.controller('CreationController',['$scope',function($scope){
+.service('sheets', [function () {
+  this.list = [];
+
+  this.add = function (lines) {
+    this.list.push({
+      id: String(this.list.length + 1),
+      createdAt: Date.now(),
+      lines: lines
+    });
+  };
+
+  this.get = function (id) {
+    var list = this.list;
+    var index = list.length;
+    var sheet;
+
+    while (index--) {
+      sheet = list[index];
+      if (sheet.id === id) {
+        return sheet;
+      }
+    }
+    return null;
+  };
+}])
+
+.controller('CreationController',['$scope','$location', 'sheets',
+function CreationController($scope,$location, sheets){
+
   function createOrderLine() {
     return {
       productName: '',
@@ -36,7 +64,7 @@ angular.module('App', ['ngRoute'])
   $scope.initialize = function() {
     $scope.lines = [createOrderLine()];
   };
-  
+
   $scope.getTotalAmount = function(lines) {
     var totalAmount = 0;
 
@@ -47,7 +75,10 @@ angular.module('App', ['ngRoute'])
     return totalAmount;
   };
 
-  $scope.save =function() {  };
+  $scope.save =function() {
+    sheets.add($scope.lines);
+    $location.path('/');
+  };
 
   $scope.removeLine = function(target) {
     var lines = $scope.lines;
@@ -61,14 +92,29 @@ angular.module('App', ['ngRoute'])
   $scope.getSubTotal = function(orderLine) {
     return orderLine.unitPrice * orderLine.count;
   };
-
-
-
 }])
 
-.controller('SheetListController' ,[function(){
-
+.controller('SheetListController' ,['$scope','sheets',
+function SheetListController($scope, sheets) {
+  $scope.list = sheets.list;
 }])
 
 
-.controller('SheetController'    ,[function(){}])
+.controller('SheetController'    ,['$scope', '$routeParams', 'sheets',
+function SheetController($scope, $params, sheets){
+  angular.extend($scope, sheets.get($params.id));
+
+  $scope.getSubtotal = function (orderLine) {
+    return orderLine.unitPrice * orderLine.count;
+  };
+
+  $scope.getTotalAmount = function (lines) {
+    var totalAmount = 0;
+
+    angular.forEach(lines, function (orderLine) {
+      totalAmount += $scope.getSubtotal(orderLine);
+    });
+
+    return totalAmount;
+  };
+}])
